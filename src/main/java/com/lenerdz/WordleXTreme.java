@@ -8,7 +8,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import javax.security.auth.login.LoginException;
 
-import com.lenerdz.commands.CalcScore;
+import com.lenerdz.commands.*;
 
 public class WordleXTreme {
 
@@ -21,5 +21,6 @@ public class WordleXTreme {
                 .build();
 
         bot.addEventListener(new CalcScore());
+        bot.addEventListener(new Score());
     }
 }
