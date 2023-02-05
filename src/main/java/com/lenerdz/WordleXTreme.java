@@ -17,10 +17,13 @@ public class WordleXTreme {
         Dotenv dotenv = Dotenv.load();
 
         JDA bot = JDABuilder.createDefault(dotenv.get("TOKEN"), GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
-                .setActivity(Activity.playing("Do the wordle!"))
+                .setActivity(Activity.listening("to you!"))
                 .build();
 
-        bot.addEventListener(new CalcScore());
-        bot.addEventListener(new Score());
+        String[] message = event.getMessage().getContentRaw().split(" "); 
+        if(message[0].equals("Wordle")){
+            bot.addEventListener(new CalcScore());
+            bot.addEventListener(new Score());
+        }
     }
 }
