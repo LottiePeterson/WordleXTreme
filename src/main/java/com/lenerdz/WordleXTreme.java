@@ -20,10 +20,9 @@ public class WordleXTreme {
                 .setActivity(Activity.listening("to you!"))
                 .build();
 
-        String[] message = event.getMessage().getContentRaw().split(" "); 
-        if(message[0].equals("Wordle")){
-            bot.addEventListener(new CalcScore());
-            bot.addEventListener(new Score());
-        }
+        
+        bot.addEventListener(new CalcScore());
+        bot.addEventListener(new Score());
+        bot.addEventListener(new ScuffedScore());
     }
 }
