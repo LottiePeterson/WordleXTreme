@@ -29,10 +29,10 @@ public class ScuffedScore extends ListenerAdapter {
             String result = "";
 
             try{
-                int tracker = 7;
+                int tracker = 6;
                 for(int  i = 0; i < 4; i++){
                     String name = message[tracker];
-                    double currSuperScore = superScore[i] + Integer.parseInt(message[tracker + 1]);
+                    double currSuperScore = superScore[i] + Double.parseDouble(message[tracker + 1]);
                     int currSubScore = subScore[i] + Integer.parseInt(message[tracker + 2]);
                     result += name + " " + currSuperScore + " " + currSubScore + "\n";
                     tracker += 3;
