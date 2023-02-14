@@ -34,7 +34,7 @@ public class ScuffedScore extends ListenerAdapter {
                     String name = message[tracker];
                     double currSuperScore = superScore[i] + Double.parseDouble(message[tracker + 1]);
                     int currSubScore = subScore[i] + Integer.parseInt(message[tracker + 2]);
-                    result += name + " " + currSuperScore + " " + currSubScore + "\n";
+                    result += name + " " + currSuperScore + " " + currSubScore;
                     tracker += 3;
                 }
                 event.getChannel().sendMessage(result).queue();
@@ -44,7 +44,7 @@ public class ScuffedScore extends ListenerAdapter {
                 "p1Name superScore subScore\n" +
                 "p2Name superScore subScore\n" +
                 "p3Name superScore subScore\n" +
-                "p4Name superScore subScore\n")queue();
+                "p4Name superScore subScore\n").queue();
             }  catch(ArrayIndexOutOfBoundsException e){
                event.getChannel().sendMessage("Invalid input, try the following format:\n" +
                "Wordle scuffed p1Score p2Score p3Score p4Score\n" +
