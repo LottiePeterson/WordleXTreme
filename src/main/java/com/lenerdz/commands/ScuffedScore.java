@@ -28,11 +28,11 @@ public class ScuffedScore extends ListenerAdapter {
 
             String result = "";
             String errorMessage = "Invalid input, try the following format:\n" +
-                "Wordle scuffed p1Score p2Score p3Score p4Score\n" +
-                "p1Name superScore subScore\n" +
-                "p2Name superScore subScore\n" +
-                "p3Name superScore subScore\n" +
-                "p4Name superScore subScore\n";
+                "Wordle scuffed p1Score p2Score p3Score p4Score \n" +
+                "p1Name superScore subScore \n" +
+                "p2Name superScore subScore \n" +
+                "p3Name superScore subScore \n" +
+                "p4Name superScore subScore \n";
             try{
                 int tracker = 6;
                 for(int  i = 0; i < 4; i++){
