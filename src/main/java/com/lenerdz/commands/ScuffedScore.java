@@ -45,6 +45,13 @@ public class ScuffedScore extends ListenerAdapter {
                 p2Name superScore subScore\n
                 p3Name superScore subScore\n
                 p4Name superScore subScore\n");
+            }  catch(ArrayIndexOutOfBoundsException e){
+               event.getChannel.sendMessage("Invalid input, try the following format:\n
+                Wordle scuffed p1Score p2Score p3Score p4Score\n
+                p1Name superScore subScore\n
+                p2Name superScore subScore\n
+                p3Name superScore subScore\n
+                p4Name superScore subScore\n");
             }
             
             // Execute a query
