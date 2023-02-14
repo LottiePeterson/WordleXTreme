@@ -32,26 +32,26 @@ public class ScuffedScore extends ListenerAdapter {
                 int tracker = 7;
                 for(int  i = 0; i < 4; i++){
                     String name = message[tracker];
-                    int superScore = superScore[i] + Integer.parseInt(message[tracker + 1]);
-                    int subScore = subScore[i] + Integer.parseInt(message[tracker + 2]);
-                    result += name + " " + superScore + " " + subScore + "\n";
+                    double currSuperScore = superScore[i] + Integer.parseInt(message[tracker + 1]);
+                    int currSubScore = subScore[i] + Integer.parseInt(message[tracker + 2]);
+                    result += name + " " + currSuperScore + " " + currSubScore + "\n";
                     tracker += 3;
                 }
                 event.getChannel().sendMessage(result).queue();
             } catch(NumberFormatException e){
-                event.getChannel.sendMessage("Invalid input, try the following format:\n
-                Wordle scuffed p1Score p2Score p3Score p4Score\n
-                p1Name superScore subScore\n
-                p2Name superScore subScore\n
-                p3Name superScore subScore\n
-                p4Name superScore subScore\n");
+                event.getChannel().sendMessage("Invalid input, try the following format:\n" +
+                "Wordle scuffed p1Score p2Score p3Score p4Score\n" +
+                "p1Name superScore subScore\n" +
+                "p2Name superScore subScore\n" +
+                "p3Name superScore subScore\n" +
+                "p4Name superScore subScore\n");
             }  catch(ArrayIndexOutOfBoundsException e){
-               event.getChannel.sendMessage("Invalid input, try the following format:\n
-                Wordle scuffed p1Score p2Score p3Score p4Score\n
-                p1Name superScore subScore\n
-                p2Name superScore subScore\n
-                p3Name superScore subScore\n
-                p4Name superScore subScore\n");
+               event.getChannel().sendMessage("Invalid input, try the following format:\n" +
+               "Wordle scuffed p1Score p2Score p3Score p4Score\n" +
+               "p1Name superScore subScore\n" +
+               "p2Name superScore subScore\n" +
+               "p3Name superScore subScore\n" +
+               "p4Name superScore subScore\n");
             }
             
             // Execute a query
