@@ -16,7 +16,7 @@ public class ScoreMultiple extends ListenerAdapter {
    public void onMessageReceived(MessageReceivedEvent event) {
       String[] message = event.getMessage().getContentRaw().split("\n");
       Scanner scnr;
-      if (message[0].equals("Wordle") && message[1].equalsIgnoreCase("multiple")) {
+      if (message[0].equals("Wordle multiple ")) {
          Dotenv dotenv = Dotenv.load();
          try (Connection conn = DriverManager.getConnection(dotenv.get("JDBC_URL"));
                Statement stmt = conn.createStatement();) {
