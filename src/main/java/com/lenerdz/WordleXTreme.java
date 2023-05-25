@@ -17,7 +17,7 @@ public class WordleXTreme {
         Dotenv dotenv = Dotenv.load();
 
         JDA bot = JDABuilder.createDefault(dotenv.get("TOKEN"), GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT)
-                .setActivity(Activity.listening("to you!"))
+                .setActivity(Activity.listening(" you!"))
                 .build();
 
         
@@ -25,5 +25,7 @@ public class WordleXTreme {
         bot.addEventListener(new Score());
         bot.addEventListener(new ScuffedScore());
         bot.addEventListener(new ScoreMultiple());
+        bot.addEventListener(new GameNew());
+        bot.addEventListener(new Game());
     }
 }
