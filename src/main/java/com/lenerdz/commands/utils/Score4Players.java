@@ -1,8 +1,8 @@
-package com.lenerdz.commands;
+package com.lenerdz.commands.utils;
 
 import java.util.Arrays;
 
-public class  Score4Players{
+public class Score4Players{
 
     /**
 	 * Scores for a 4 player game using the playerArr

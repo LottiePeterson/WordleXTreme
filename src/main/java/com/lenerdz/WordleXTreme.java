@@ -24,8 +24,9 @@ public class WordleXTreme {
         bot.addEventListener(new CalcScore());
         bot.addEventListener(new Score());
         bot.addEventListener(new ScuffedScore());
-        bot.addEventListener(new ScoreMultiple());
+        //bot.addEventListener(new ScoreMultiple());
         bot.addEventListener(new GameNew());
         bot.addEventListener(new Game());
+        bot.addEventListener(new ScoreMany());
     }
 }
