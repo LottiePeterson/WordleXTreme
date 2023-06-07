@@ -2,6 +2,7 @@ package com.lenerdz.commands;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -29,21 +30,27 @@ public class GameNew extends ListenerAdapter {
             try (Connection conn = DriverManager.getConnection(dotenv.get("JDBC_URL"));
                   Statement stmt = conn.createStatement();) {
                
+               // set all other games Current column to 0 so they are not the current games
                String updateCurrString = "UPDATE Games SET Current = 0;";
                stmt.executeUpdate(updateCurrString);
                
-               System.out.println(LocalDate.now().toString());
-               String makeGameSql = "INSERT INTO Games (Name, StartDate, EndDate, Current, PlayerID) VALUES (\"" + message[3] + "\", \""+ LocalDate.now().toString() +"\", NULL, 1, NULL);";
-               stmt.executeUpdate(makeGameSql);
+               String insertString = "INSERT INTO Games (Name, StartDate, EndDate, Current, PlayerID) VALUES (?, ?, NULL, 1, NULL);";
+               PreparedStatement insertNewGame = conn.prepareStatement(insertString);
 
-               event.getChannel().sendMessage("Hey hey hey she worked I think!").queue();
-               // // Execute a query
-               // String sql = "INSERT INTO `Games` (`ID`, `Name`, `StartDate`, `EndDate`,
-               // `Current`, `PlayerID`) VALUES (NULL, 'New Game', '2023-03-17', NULL, '1',
-               // NULL)";
-               // //String sql = "INSERT INTO `Scores` (`GameID`, `PlayerID`, `WordleNum`,
-               // `CumulativeScore`, `CompetitiveScore`) VALUES (1, 1, 674, 2, NULL)";
-               // stmt.executeUpdate(sql);
+               conn.setAutoCommit(false);
+               insertNewGame.setString(1, message[3]);
+               insertNewGame.setString(2, LocalDate.now().toString());
+               insertNewGame.executeUpdate();
+               conn.commit();
+               //String makeGameSql = "INSERT INTO Games (Name, StartDate, EndDate, Current, PlayerID) VALUES (\"" + message[3] + "\", \""+ LocalDate.now().toString() +"\", NULL, 1, NULL);";
+               //stmt.executeUpdate(makeGameSql);
+               
+               String gameString = "=====** " + message[3] + " **=====\n" + "No Players\n";
+               for(int i = 0; i < message[3].length() + 12; i++) {
+                  gameString += "=";
+               }
+               event.getChannel().sendMessage(gameString).queue();
+
                // EmbedBuilder embed = new EmbedBuilder();
                // embed.setTitle("New Game");
                // embed.setDescription("Add some players!");

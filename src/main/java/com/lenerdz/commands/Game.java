@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.EmbedBuilder;
+//import net.dv8tion.jda.api.EmbedBuilder;
 
 public class Game extends ListenerAdapter {
 
@@ -32,13 +32,20 @@ public class Game extends ListenerAdapter {
             String gameName = "";
             String tempResult = "";
             int gameID = -1;
+            if (!gameInfo.next()) {
+               event.getChannel().sendMessage("Game not started!").queue();
+               return;
+            }
             while (gameInfo.next()) {
                gameName = gameInfo.getString("Name");
                gameID = gameInfo.getInt("GameID");
                tempResult += "\n" + gameInfo.getString("WordleName") + ": " + gameInfo.getInt("totalSuperScore") + " " + gameInfo.getInt("totalSubScore");
             }
-            String result = "=====**" + gameName + "**=====" + tempResult + "\n=====*Game ID " + gameID + "*=====";
-
+            System.out.print(gameName);
+            String result = "=====** " + gameName + " **=====" + tempResult + "\n" + "\n=====*Game ID " + gameID + "*=====";
+            // for (int i = 0; i < gameName.length() + 12; i++) {
+            //    result += "=";
+            // }
             event.getChannel().sendMessage(result).queue();
             // Execute a query
             // String sql = "INSERT INTO `Scores` (`GameID`, `PlayerID`, `WordleNum`, `CumulativeScore`, `CompetitiveScore`) VALUES (1, 1, 674, 2, NULL)";

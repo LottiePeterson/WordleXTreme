@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.Scanner;
 import java.lang.Integer;
 
@@ -83,11 +82,12 @@ public class ScoreMany extends ListenerAdapter{
 
                 String result = "";
                 String errorMessage = "Invalid input, try the following format:\n" +
-                        "Wordle scuffed p1Score p2Score p3Score p4Score \n" +
-                        "p1Name superScore subScore \n" +
-                        "p2Name superScore subScore \n" +
-                        "p3Name superScore subScore \n" +
-                        "p4Name superScore subScore \n";
+                    "Wordle scoreMany [int num players] \n" +
+                    "p1Score p2Score p3Score p4Score ... \n" +
+                    "Player1Name superScore subScore \n" + 
+                    "Player2Name superScore subScore \n" +
+                    "Player3Name superScore subScore \n" + 
+                    "...";
                 try {
                     int tracker = numPlayers + 3;
                     for (int i = 0; i < numPlayers; i++) {
