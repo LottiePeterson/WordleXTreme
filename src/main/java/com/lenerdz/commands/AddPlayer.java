@@ -31,16 +31,23 @@ public class AddPlayer extends ListenerAdapter {
          try (Connection conn = DriverManager.getConnection(dotenv.get("JDBC_URL"));
                Statement stmt = conn.createStatement();) {
             
-            if(message.length < 5) {
-               event.getChannel().sendMessage("Oh no! Not enough info to add a new player! Remember, names must not contain spaces or the @ character. Try this format: \nWordle add player [DisplayName] [@user]").queue();
-            }
-
+            // Various error cases via user input mistakes
             List<User> users = event.getMessage().getMentions().getUsers();
-            if (users.isEmpty()) {
-               event.getChannel().sendMessage("Oh no! You didn't mention anyone! Try this format: \nWordle add player [DisplayName] [@user]").queue();
-            }
-            if(message[3].contains("@")) {
-               event.getChannel().sendMessage("Oh no! You didn't give your player a dispaly name or the display name contained a @ symbol. Remember, names must not contain spaces or the @ character. Try this format: \nWordle add player [DisplayName] [@user]").queue();
+            if (message.length == 3) {
+               event.getChannel().sendMessage("To add a player, try this command again with this format: \nWordle add player [DisplayName] [@user]").queue();
+               return;
+            } else if (users.isEmpty()) {
+               event.getChannel().sendMessage("Oh no! You forgot to mention someone! Try this format: \nWordle add player [DisplayName] [@user]").queue();
+               return;
+            } else if (message.length == 4) {
+               event.getChannel().sendMessage("Oh no! You forgot to give your player a display name! Try this format: \nWordle add player [DisplayName] [@user]").queue();
+               return;
+            } else if (users.size() > 1) {
+               event.getChannel().sendMessage("Oh no! You used too many mentions! Remember to mention only one user. Try this format: \nWordle add player [DisplayName] [@user]").queue();              
+               return;
+            } else if (message.length > 5) {
+               event.getChannel().sendMessage("The Wordle name you selected includes a space. Remember a Wordle name must not include spaces. Try this format: \nWordle add player [DisplayName] [@user]").queue();
+               return;
             }
 
             // Get the playerID from the Players table
@@ -78,6 +85,12 @@ public class AddPlayer extends ListenerAdapter {
                gameID = gameInfo.getInt("ID");
             }
 
+            // Edge case where the player is already in the current game
+            ResultSet gamesPlayersInfo = stmt.executeQuery("SELECT ID FROM GamesPlayers WHERE GameID = " + gameID + " AND PlayerID = " + playerID + ";");
+            while(gamesPlayersInfo.next()) {
+               event.getChannel().sendMessage("This player is already included in the game!").queue();
+               return;
+            }
             // Link the player to the current game via the GamesPlayers table
             String gamesPlayersInsertString = "INSERT INTO GamesPlayers (GameID, PlayerID) VALUES (" + gameID + ", " + playerID + ")";
             stmt.executeUpdate(gamesPlayersInsertString);
