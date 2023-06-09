@@ -32,20 +32,21 @@ public class Game extends ListenerAdapter {
             String gameName = "";
             String tempResult = "";
             int gameID = -1;
-            if (!gameInfo.next()) {
-               event.getChannel().sendMessage("Game not started!").queue();
-               return;
-            }
+
             while (gameInfo.next()) {
                gameName = gameInfo.getString("Name");
                gameID = gameInfo.getInt("GameID");
                tempResult += "\n" + gameInfo.getString("WordleName") + ": " + gameInfo.getInt("totalSuperScore") + " " + gameInfo.getInt("totalSubScore");
             }
-            System.out.print(gameName);
-            String result = "=====** " + gameName + " **=====" + tempResult + "\n" + "\n=====*Game ID " + gameID + "*=====";
-            // for (int i = 0; i < gameName.length() + 12; i++) {
-            //    result += "=";
-            // }
+
+            if (gameID == -1) {
+               event.getChannel().sendMessage("Game not started!").queue();
+               return;
+            }
+
+            System.out.println(gameName);
+            String result = "=====** " + gameName + " **=====" + tempResult + "\n=====*Game ID " + gameID + "*=====";
+
             event.getChannel().sendMessage(result).queue();
             // Execute a query
             // String sql = "INSERT INTO `Scores` (`GameID`, `PlayerID`, `WordleNum`, `CumulativeScore`, `CompetitiveScore`) VALUES (1, 1, 674, 2, NULL)";
@@ -55,13 +56,5 @@ public class Game extends ListenerAdapter {
          }
          
       }
-   }
-
-   private int getSuperScore() {
-      return 0;
-   }
-
-   private int getSubScore() {
-      return 0;
    }
 }
