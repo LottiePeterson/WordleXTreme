@@ -1,14 +1,10 @@
 package com.lenerdz.commands;
 
-import java.lang.reflect.Member;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
-
-import javax.management.QueryEval;
 
 import java.sql.ResultSet;
 import java.util.*;
@@ -17,8 +13,6 @@ import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.entities.User;
-//import net.dv8tion.jda.api.EmbedBuilder;
-//import scala.collection.immutable.List;
 
 public class AddPlayer extends ListenerAdapter {
 

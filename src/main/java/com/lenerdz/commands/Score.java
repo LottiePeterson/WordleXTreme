@@ -5,8 +5,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.sql.PreparedStatement;
 
-import com.lenerdz.commands.utils.Score4Players;
+import com.lenerdz.commands.utils.ScoreManyPlayers;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -14,111 +17,113 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class Score extends ListenerAdapter {
 
-   // @Override
-   // public void onMessageReceived(MessageReceivedEvent event) {
-   // String[] message = event.getMessage().getContentRaw().split(" ");
-
-   // if (message[0].equals("Wordle") && message[1].equalsIgnoreCase("score")) {
-   // Dotenv dotenv = Dotenv.load();
-   // try (Connection conn = DriverManager.getConnection(dotenv.get("JDBC_URL"));
-   // Statement stmt = conn.createStatement();) {
-   // int[] subScore = new int[message.length - 2];
-   // for(int i = 2; i < message.length; i++){
-   // subScore[i - 2] = Integer.parseInt(message[i]);
-   // }
-   // double[] superScore = Score4Players.score4Players(subScore);
-   // for(int i = 0; i < superScore.length; i++){
-   // event.getChannel().sendMessage(superScore[i] + " "+ subScore[i]).queue();
-   // }
-   // // Execute a query
-   // String sql = "INSERT INTO `Scores` (`GameID`, `PlayerID`, `WordleNum`,
-   // `CumulativeScore`, `CompetitiveScore`) VALUES (1, 1, 674, 2, NULL)";
-   // stmt.executeUpdate(sql);
-   // } catch (SQLException e) {
-   // e.printStackTrace();
-   // }
-   // }
-   // }
-
    @Override
    public void onMessageReceived(MessageReceivedEvent event) {
       String[] message = event.getMessage().getContentRaw().split(" ");
+      String formatString = "Wordle Score [GameNumber]\n"
+            + "[PlayerName] [numberOfGuesses]\n"
+            + "[PlayerName] [numberOfGuesses]\n"
+            + "...";
 
-      if (message[0].equals("Wordle") && message[1].equalsIgnoreCase("score")) {
+      if (message.length >= 2 && message[0].equals("Wordle") && message[1].equalsIgnoreCase("score")) {
          Dotenv dotenv = Dotenv.load();
          try (Connection conn = DriverManager.getConnection(dotenv.get("JDBC_URL"));
-               Statement stmt = conn.createStatement();) {
-
-            //System.out.println("In 1");
-            int[] subScore = new int[4];
-            for (int i = 2; i < 6; i++) {
-               subScore[i - 2] = Integer.parseInt(message[i]);
+               Statement stmt = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);) {
+            // No scores were listed at all. User wanted more information about the use of
+            // the command.
+            if (message.length == 2) {
+               event.getChannel()
+                     .sendMessage("To add a new score, try this command again with this format:\n" + formatString).queue();
+               return;
             }
-            double[] superScore = Score4Players.score4Players(subScore);
 
-            String result = "";
-            String errorMessage = "Invalid input, try the following format:\n" +
-                  "Wordle scuffed p1Score p2Score p3Score p4Score \n" +
-                  "p1Name superScore subScore \n" +
-                  "p2Name superScore subScore \n" +
-                  "p3Name superScore subScore \n" +
-                  "p4Name superScore subScore \n";
-            try {
-               int tracker = 6;
-               for (int i = 0; i < 4; i++) {
-                  String name = message[tracker];
+            // Based on the necessary input format, there should always be an odd number of
+            // words/charsequences entered.
+            System.out.println(message.length + " " + (message.length % 2));
+            if ((message.length % 2) == 0) {
+               event.getChannel()
+                     .sendMessage("Oh no! You haven't entered the command properly. Try this format:\n" + formatString)
+                     .queue();
+               return;
+            }
 
-                  if (name.charAt(0) != '\n') {
-                     name = "\n" + name;
-                  }
-
-                  double currSuperScore = superScore[i] + Double.parseDouble(message[tracker + 1]);
-                  int currSubScore = subScore[i] + Integer.parseInt(message[tracker + 2]);
-
-                  String gameIdSql = "SELECT `ID` FROM `Games` WHERE `Current` = 1;";
-                  ResultSet gameIdSet = stmt.executeQuery(gameIdSql);
-                   
-                  int gameId = 0;
-                  while (gameIdSet.next()) {
-                     gameId = gameIdSet.getInt(1);
-                 }
-                  System.out.println(gameId + " reached!");
-
-                  String sqlNameMod = message[tracker].substring(1);
-                  String nameIdSql = "SELECT ID FROM Players WHERE WordleName LIKE '" + sqlNameMod + "';";
-                  System.out.print(nameIdSql);
-
-                  ResultSet nameIdSet = stmt.executeQuery(nameIdSql);
-
-                  int nameId = -1;
-                  while (nameIdSet.next()) {
-                     nameId = nameIdSet.getInt(1);
-                 }
-
-                  String insertString = "INSERT INTO Scores(ID, GameID, PlayerID, WordleNum, SubScore, SuperScore) VALUES (NULL," + gameId + ", " + nameId + ",668," + currSubScore + "," + currSuperScore + ")";
-                  stmt.executeUpdate(insertString);
-
-                  result += name + " " + currSuperScore + " " + currSubScore + " ";
-                  tracker += 3;
-
-                  stmt.close();
+            ArrayList<String> messageNames = new ArrayList<>();
+            ArrayList<Integer> messageSubScores = new ArrayList<>();
+            for (int i = 3; i < message.length; i += 2) {
+               try {
+                  messageNames.add(message[i]);
+                  messageSubScores.add(Integer.parseInt(message[i + 1]));
+               } catch (NumberFormatException e) {
+                  // If the second String in each line cannot be parsed as an int, there was an
+                  // input issue.
+                  event.getChannel()
+                        .sendMessage(
+                              "Oh no! You haven't entered the command properly. Try this format:\n" + formatString)
+                        .queue();
+                  return;
                }
-               conn.close();
-               stmt.close();
-               event.getChannel().sendMessage(result).queue();
-            } catch (NumberFormatException e) {
-               event.getChannel().sendMessage(errorMessage).queue();
-            } catch (ArrayIndexOutOfBoundsException e) {
-               event.getChannel().sendMessage(errorMessage).queue();
-            } catch (Exception e) {
-               event.getChannel().sendMessage(e.toString()).queue();
+            }
+            int[] subScores = new int[messageSubScores.size()];
+            for (int c = 0; c < messageSubScores.size(); c++) {
+               subScores[c] = messageSubScores.get(c);
             }
 
-            // Execute a query
+            double[] placeValues = new double[messageSubScores.size()];
+            for (int i = 0; i < placeValues.length; i++) {
+               placeValues[i] = messageNames.size() - 1 - i;
+            }
+            try {
+               ResultSet tablePlayers = stmt.executeQuery(
+                     "SELECT gp.PlayerID, gp.GameID, p.WordleName FROM GamesPlayers gp JOIN Players p ON gp.PlayerID = p.ID JOIN Games g ON gp.GameID = g.ID WHERE g.Current = 1;");
+               int resultSetSize = 0;
+               while (tablePlayers.next()) {
+                  String testyname = tablePlayers.getString("WordleName");
+                  // System.out.print("{newlineLottie} " + messageNames.contains("\nLottie"));
+                  ++resultSetSize;
+                  if (!messageNames.contains(testyname)) {
+                     System.out.println(messageNames.toString() + " {" + testyname + "}");
+                     event.getChannel().sendMessage(
+                           "Oh no! You entered a WordleName that does not exist in the current game! Try again with this format:\n"
+                                 + formatString)
+                           .queue();
+                           return;
+                  }
+               }
+
+               if (resultSetSize != messageNames.size()) {
+                  System.out.println(tablePlayers.getFetchSize() + " " + messageNames.size());
+                  event.getChannel().sendMessage(
+                        "Oh no! You have not entered the correct amount of players to add a new score to the game! Try again with this format:")
+                        .queue();
+                        return;
+               }
+
+               double[] superScore = ScoreManyPlayers.scoreVariable(subScores, placeValues);
+               System.out.println("In 0 " + tablePlayers.getType());
+               tablePlayers.beforeFirst();
+
+               int count = 0;
+               while (tablePlayers.next()) {
+                  System.out.println("In 1");
+                  String insertString = "INSERT INTO Scores (GameID, PlayerID, WordleNum, SubScore, SuperScore) VALUES (?, ? ,?, ?, ?)";
+                  PreparedStatement insertScore = conn.prepareStatement(insertString);
+
+                  conn.setAutoCommit(false);
+                  insertScore.setInt(1, tablePlayers.getInt("GameID"));
+                  insertScore.setInt(2, tablePlayers.getInt("PlayerID"));
+                  insertScore.setInt(3, Integer.parseInt(message[2]));
+                  insertScore.setInt(4, messageSubScores.get(count));
+                  insertScore.setDouble(5, superScore[count]);
+                  insertScore.executeUpdate();
+                  conn.commit();
+                  count++;
+               }
+            } catch (SQLException e) {
+               event.getChannel().sendMessage("Something went wrong!! Contact Jack and Lottie :/").queue();
+            }
          } catch (SQLException e) {
             e.printStackTrace();
          }
       }
    }
-
 }
