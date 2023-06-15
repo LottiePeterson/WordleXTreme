@@ -4,14 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.ResultSet;
+//import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.LocalDate;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.EmbedBuilder;
+//import net.dv8tion.jda.api.EmbedBuilder;
 
 public class GameNew extends ListenerAdapter {
 
