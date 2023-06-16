@@ -6,10 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Set;
 import java.sql.PreparedStatement;
 
 import com.lenerdz.commands.utils.ScoreManyPlayers;

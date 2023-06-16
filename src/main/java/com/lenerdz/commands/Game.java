@@ -36,7 +36,7 @@ public class Game extends ListenerAdapter {
             while (gameInfo.next()) {
                gameName = gameInfo.getString("Name");
                gameID = gameInfo.getInt("GameID");
-               tempResult += "\n" + gameInfo.getString("WordleName") + ": " + gameInfo.getInt("totalSuperScore") + " " + gameInfo.getInt("totalSubScore");
+               tempResult += "\n" + gameInfo.getString("WordleName") + ": " + gameInfo.getDouble("totalSuperScore") + " " + gameInfo.getInt("totalSubScore");
             }
 
             if (gameID == -1) {
