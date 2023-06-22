@@ -3,6 +3,7 @@ package com.lenerdz.commands;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 //import java.sql.ResultSet;
 import java.sql.Statement;
@@ -31,8 +32,13 @@ public class GameNew extends ListenerAdapter {
                   Statement stmt = conn.createStatement();) {
                
                // set all other games Current column to 0 so they are not the current games
-               String updateCurrString = "UPDATE Games SET Current = 0;";
-               stmt.executeUpdate(updateCurrString);
+               // String updateCurrString = "UPDATE Games SET Current = 0;";
+               // stmt.executeUpdate(updateCurrString);
+               ResultSet currentGames = stmt.executeQuery("SELECT ID FROM Games WHERE Current = 1;");
+               if(currentGames.next()) {
+                  event.getChannel().sendMessage("There is already a game active in this server! Try ending that game and then starting a new one.").queue();
+                  return;
+               }
                
                String insertString = "INSERT INTO Games (Name, StartDate, EndDate, Current, PlayerID) VALUES (?, ?, NULL, 1, NULL);";
                PreparedStatement insertNewGame = conn.prepareStatement(insertString);

@@ -40,7 +40,7 @@ public class Game extends ListenerAdapter {
             }
 
             if (gameID == -1) {
-               event.getChannel().sendMessage("Game not started!").queue();
+               event.getChannel().sendMessage("No current game in this server!").queue();
                return;
             }
 
@@ -48,9 +48,6 @@ public class Game extends ListenerAdapter {
             String result = "=====** " + gameName + " **=====" + tempResult + "\n=====*Game ID " + gameID + "*=====";
 
             event.getChannel().sendMessage(result).queue();
-            // Execute a query
-            // String sql = "INSERT INTO `Scores` (`GameID`, `PlayerID`, `WordleNum`, `CumulativeScore`, `CompetitiveScore`) VALUES (1, 1, 674, 2, NULL)";
-            // stmt.executeUpdate(sql);
          } catch (SQLException e) {
             e.printStackTrace();
          }

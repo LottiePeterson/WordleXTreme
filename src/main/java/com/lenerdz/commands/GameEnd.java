@@ -29,7 +29,7 @@ public class GameEnd extends ListenerAdapter {
             int winnerID = -1;
             int maxSuperScore = -1;
             int minSubScore = -1;
-            System.out.println("OUTSIDE WHILE!! WinnerID: " + winnerID + " maxSuperScore: " + maxSuperScore + " minSubScore: " + minSubScore);
+            //System.out.println("OUTSIDE WHILE!! WinnerID: " + winnerID + " maxSuperScore: " + maxSuperScore + " minSubScore: " + minSubScore);
             while(currentGameInfo.next()) {
                int testSuperScore = currentGameInfo.getInt("totalSuperScore");
                if (testSuperScore > maxSuperScore) {
@@ -47,15 +47,23 @@ public class GameEnd extends ListenerAdapter {
                }
                System.out.println("WinnerID: " + winnerID + " maxSuperScore: " + maxSuperScore + " minSubScore: " + minSubScore);
             }
-            System.out.println(LocalDate.now().toString());
-            String updateEndGameString = "UPDATE Games SET PlayerID = \"" + winnerID + "\", EndDate = \"" + LocalDate.now().toString() + "\" WHERE Current = 1;";
-            stmt.executeUpdate(updateEndGameString);
+
+            if (winnerID == -1) {
+               String updateEndGameString = "UPDATE Games SET EndDate = \"" + LocalDate.now().toString() + "\" WHERE Current = 1;";
+               stmt.executeUpdate(updateEndGameString);
+            } else {
+               String updateEndGameString = "UPDATE Games SET PlayerID = \"" + winnerID + "\", EndDate = \"" + LocalDate.now().toString() + "\" WHERE Current = 1;";
+               stmt.executeUpdate(updateEndGameString);
+            }
+   
+            String updateCurrString = "UPDATE Games SET Current = 0;";
+            stmt.executeUpdate(updateCurrString);
             
             // String gameString = "=====** " + message[3] + " **=====\n" + "No Players\n";
             // for(int i = 0; i < message[3].length() + 12; i++) {
             //    gameString += "=";
             // }
-            event.getChannel().sendMessage("Something prolly happend *shrug*").queue();
+            event.getChannel().sendMessage("Game ended!").queue();
 
          } catch (SQLException e) {
             event.getChannel().sendMessage("Couldn't end the game :(").queue();
