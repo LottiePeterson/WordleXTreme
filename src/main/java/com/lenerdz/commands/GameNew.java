@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 
+import com.lenerdz.services.GameBuilder;
+
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -48,14 +50,13 @@ public class GameNew extends ListenerAdapter {
                insertNewGame.setString(2, LocalDate.now().toString());
                insertNewGame.executeUpdate();
                conn.commit();
-               //String makeGameSql = "INSERT INTO Games (Name, StartDate, EndDate, Current, PlayerID) VALUES (\"" + message[3] + "\", \""+ LocalDate.now().toString() +"\", NULL, 1, NULL);";
-               //stmt.executeUpdate(makeGameSql);
-               
-               String gameString = "=====** " + message[3] + " **=====\n" + "No Players\n";
-               for(int i = 0; i < message[3].length() + 12; i++) {
-                  gameString += "=";
-               }
-               event.getChannel().sendMessage(gameString).queue();
+                              
+               // String gameString = "=====** " + message[3] + " **=====\n" + "No Players\n";
+               // for(int i = 0; i < message[3].length() + 12; i++) {
+               //    gameString += "=";
+               // }
+               GameBuilder gameBoy = new GameBuilder();
+               event.getChannel().sendMessage(gameBoy.getCurrrentGame()).queue();
 
                // EmbedBuilder embed = new EmbedBuilder();
                // embed.setTitle("New Game");

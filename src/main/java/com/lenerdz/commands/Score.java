@@ -8,9 +8,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.sql.PreparedStatement;
 
-import com.lenerdz.commands.utils.ScoreManyPlayers;
+import com.lenerdz.services.GameBuilder;
+import com.lenerdz.services.ScoreManyPlayers;
+
+import java.sql.PreparedStatement;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -21,9 +23,9 @@ public class Score extends ListenerAdapter {
    @Override
    public void onMessageReceived(MessageReceivedEvent event) {
       String[] message = event.getMessage().getContentRaw().split(" ");
-      String formatString = "Wordle Score [GameNumber]\n"
-            + "[PlayerName] [numberOfGuesses]\n"
-            + "[PlayerName] [numberOfGuesses]\n"
+      String formatString = "Wordle Score [GameNumber] \n"
+            + "[PlayerName] [numberOfGuesses] \n"
+            + "[PlayerName] [numberOfGuesses] \n"
             + "...";
 
       if (message.length >= 2 && message[0].equals("Wordle") && message[1].equalsIgnoreCase("score")) {
@@ -40,7 +42,6 @@ public class Score extends ListenerAdapter {
 
             // Based on the necessary input format, there should always be an odd number of
             // words/charsequences entered.
-            System.out.println(message.length + " " + (message.length % 2));
             if ((message.length % 2) == 0) {
                event.getChannel()
                      .sendMessage("Oh no! You haven't entered the command properly. Try this format:\n" + formatString)
@@ -51,13 +52,11 @@ public class Score extends ListenerAdapter {
             HashMap<String, Double> namesToSuperScores = new HashMap<>();
 
             ArrayList<String> messageNames = new ArrayList<>();
-            //ArrayList<Integer> messageSubScores = new ArrayList<>();
             for (int i = 3; i < message.length; i += 2) {
                try {
                   namesToSubScores.put(message[i], Integer.parseInt(message[i + 1]));
                   namesToSuperScores.put(message[i], null);
                   messageNames.add(message[i]);
-                  // messageSubScores.add(Integer.parseInt(message[i + 1]));
                } catch (NumberFormatException e) {
                   // If the second String in each line cannot be parsed as an int, there was an
                   // input issue.
@@ -85,10 +84,8 @@ public class Score extends ListenerAdapter {
                int resultSetSize = 0;
                while (tablePlayers.next()) {
                   String testyname = tablePlayers.getString("WordleName");
-                  // System.out.print("{newlineLottie} " + messageNames.contains("\nLottie"));
                   ++resultSetSize;
                   if (!namesToSubScores.containsKey(testyname)) {
-                     //System.out.println(messageNames.toString() + " {" + testyname + "}");
                      event.getChannel().sendMessage(
                            "Oh no! You entered a WordleName that does not exist in the current game! Try again with this format:\n"
                                  + formatString)
@@ -98,22 +95,23 @@ public class Score extends ListenerAdapter {
                }
 
                if (resultSetSize != namesToSubScores.size()) {
-                  //System.out.println(tablePlayers.getFetchSize() + " " + namesToSubScores.size());
                   event.getChannel().sendMessage(
                         "Oh no! You have not entered the correct amount of players to add a new score to the game! Try again with this format:")
                         .queue();
                         return;
+               }
+               if (resultSetSize == 1) {
+                  event.getChannel().sendMessage("Oh no! There aren't enough players in the game. You need at least one more! Try adding another player!").queue();
+                  return;
                }
 
                double[] superScore = ScoreManyPlayers.scoreVariable(subScores, placeValues);
                for(int i = 0; i < namesToSuperScores.size(); i++) {
                   namesToSuperScores.replace(messageNames.get(i), superScore[i]);
                }
-               //System.out.println("In 0 " + tablePlayers.getType());
                tablePlayers.beforeFirst();
 
                while (tablePlayers.next()) {
-                  //System.out.println("In 1");
                   String currName = tablePlayers.getString("WordleName");
                   Integer currSubScore = namesToSubScores.get(currName);
                   Double currSuperScore = namesToSuperScores.get(currName);
@@ -133,6 +131,9 @@ public class Score extends ListenerAdapter {
             } catch (SQLException e) {
                event.getChannel().sendMessage("Something went wrong!! Contact Jack and Lottie :/").queue();
             }
+            GameBuilder gameBoy = new GameBuilder();
+            event.getChannel().sendMessage(gameBoy.getCurrrentGame()).queue();
+
          } catch (SQLException e) {
             e.printStackTrace();
          }

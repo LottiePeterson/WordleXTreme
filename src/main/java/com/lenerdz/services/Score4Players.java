@@ -1,4 +1,4 @@
-package com.lenerdz.commands.utils;
+package com.lenerdz.services;
 
 import java.util.Arrays;
 

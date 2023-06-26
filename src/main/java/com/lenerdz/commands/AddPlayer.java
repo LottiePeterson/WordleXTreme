@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.*;
 
+import com.lenerdz.services.GameBuilder;
+
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -43,7 +45,6 @@ public class AddPlayer extends ListenerAdapter {
                event.getChannel().sendMessage("The Wordle name you selected includes a space. Remember a Wordle name must not include spaces. Try this format: \nWordle add player [DisplayName] [@user]").queue();
                return;
             }
-
             // Get the playerID from the Players table
             int playerID = -1;
             ResultSet userInfo = stmt.executeQuery("SELECT ID FROM Players WHERE UserID = " + users.get(0).getId());
@@ -78,6 +79,10 @@ public class AddPlayer extends ListenerAdapter {
             while(gameInfo.next()) {
                gameID = gameInfo.getInt("ID");
             }
+            if (gameID == -1) {
+               event.getChannel().sendMessage("Oh no! You cannot add a player because there is not current game! Try starting a game first.").queue();
+               return;
+            }
 
             // Edge case where the player is already in the current game
             ResultSet gamesPlayersInfo = stmt.executeQuery("SELECT ID FROM GamesPlayers WHERE GameID = " + gameID + " AND PlayerID = " + playerID + ";");
@@ -88,14 +93,13 @@ public class AddPlayer extends ListenerAdapter {
             // Link the player to the current game via the GamesPlayers table
             String gamesPlayersInsertString = "INSERT INTO GamesPlayers (GameID, PlayerID) VALUES (" + gameID + ", " + playerID + ")";
             stmt.executeUpdate(gamesPlayersInsertString);
-            System.out.println("Inserted into gamesPlayers!");
 
             // Add in a base score of (0, 0) for this player
             String baseScoreInsertString = "INSERT INTO Scores (GameID, PlayerID, WordleNum, SubScore, SuperScore) VALUES (" + gameID + ", " + playerID + ", -1, 0, 0)";
             stmt.executeUpdate(baseScoreInsertString);
-            System.out.println("Inserted into scores");
 
-            event.getChannel().sendMessage("Player added!").queue();
+            GameBuilder gameBoy = new GameBuilder();
+            event.getChannel().sendMessage(gameBoy.getCurrrentGame()).queue();
          } catch (SQLException e) {
             e.printStackTrace();
          }

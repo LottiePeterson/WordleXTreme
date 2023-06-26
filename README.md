@@ -1,2 +1,6 @@
 # WordleXTreme
-This bot will mostly focus on keeping track of the wordle score, but it might have other uses
+Welcome to the WordleXTreme! It is a fun Bot Buddy created, updated, and maintained by Jack Tonn and Lottie Peterson 
+as a fun side project to fascilitate their Wordle competition in their college-friends Discord server.
+
+We hope you have fun with the WordleXTreme!
+ 

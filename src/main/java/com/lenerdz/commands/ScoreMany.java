@@ -5,9 +5,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
-import java.lang.Integer;
 
-import com.lenerdz.commands.utils.ScoreManyPlayers;
+import com.lenerdz.services.ScoreManyPlayers;
+
+import java.lang.Integer;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
