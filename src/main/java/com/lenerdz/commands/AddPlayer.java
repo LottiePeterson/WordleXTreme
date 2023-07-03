@@ -60,7 +60,7 @@ public class AddPlayer extends ListenerAdapter {
 
                conn.setAutoCommit(false);
                insertPlayer.setString(1, users.get(0).getId());
-               insertPlayer.setString(2, users.get(0).getAsTag());
+               insertPlayer.setString(2, users.get(0).getName());
                insertPlayer.setString(3, message[3]);
                insertPlayer.executeUpdate();
                conn.commit();

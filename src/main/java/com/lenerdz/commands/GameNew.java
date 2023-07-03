@@ -37,14 +37,11 @@ public class GameNew extends ListenerAdapter {
                // String updateCurrString = "UPDATE Games SET Current = 0;";
                // stmt.executeUpdate(updateCurrString);
                String guildStringID = event.getGuild().getId();
-               System.out.println(guildStringID + " guild string <-\n");
                ResultSet guilds = stmt.executeQuery("SELECT ID FROM Guilds WHERE GuildStringID = \"" + guildStringID + "\"");
                int guildTableID = -1;
                while(guilds.next()) {
                   guildTableID = guilds.getInt("ID"); 
-                  System.out.println(guildTableID + " guild string UPDATED<-\n");
                }
-               System.out.println(guildTableID + " guild string UPDATED 2<-\n");
                if(guildTableID == -1) {
                   String guildInsertString = "INSERT INTO Guilds (GuildStringID) VALUES (?);";
                   PreparedStatement insertNewGuild = conn.prepareStatement(guildInsertString, Statement.RETURN_GENERATED_KEYS);
@@ -59,12 +56,6 @@ public class GameNew extends ListenerAdapter {
                   if(guildIDSet.next()) {
                      guildTableID = guildIDSet.getInt(1);
                   }
-                  System.out.println("Guild table ID test: " + guildTableID + " ");
-                  // stmt.executeUpdate("INSERT INTO Guilds (GuildStringID) VALUES (\"" + guildStringID + "\");");
-                  // guilds = stmt.executeQuery("SELECT ID FROM Guilds WHERE GuildID = \"" + guildStringID + "\"");
-                  // while(guilds.next()) {
-                  //    guildTableID = guilds.getInt("ID");
-                  // }
                }
                ResultSet currentGames = stmt.executeQuery("SELECT g.ID FROM Games g JOIN Guilds glds ON g.GuildID = glds.ID WHERE g.Current = 1 AND glds.GuildStringID = \"" + guildTableID + "\";");
                if(currentGames.next()) {
@@ -93,8 +84,7 @@ public class GameNew extends ListenerAdapter {
                   event.getChannel().sendMessage("Bro something went wrong you should check that. Yes, you.").queue();
                   return;
                }
-               //stmt.executeUpdate("INSERT INTO GamesGuilds (GameID, GuildID) VALUES (" + generatedKey + ", " + guildTableID +");");
-                              
+                                             
                GameBuilder gameBoy = new GameBuilder(event.getGuild().getId());
                event.getChannel().sendMessage(gameBoy.getCurrrentGame()).queue();
 
