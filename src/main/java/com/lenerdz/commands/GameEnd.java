@@ -24,7 +24,9 @@ public class GameEnd extends ListenerAdapter {
          Dotenv dotenv = Dotenv.load();
          try (Connection conn = DriverManager.getConnection(dotenv.get("JDBC_URL"));
                Statement stmt = conn.createStatement();) {
-
+            
+            GameBuilder gameBoy = new GameBuilder(event.getGuild().getId());
+            // ResultSet currentGameInfo = gameBoy.getCurrentGameResultSet();
             ResultSet currentGameInfo = stmt.executeQuery("SELECT p.WordleName, gp.PlayerID, gp.GameID, g.Name, SUM(s.SubScore) AS totalSubScore, SUM(s.SuperScore) AS totalSuperScore FROM GamesPlayers gp JOIN Games g ON gp.GameID = g.ID JOIN Scores s ON gp.PlayerID = s.PlayerID AND gp.GameID = s.GameID JOIN Players p on gp.PlayerID = p.ID WHERE g.Current = 1 GROUP BY p.WordleName, gp.PlayerID, gp.GameID ORDER BY p.WordleName;");
             int winnerID = -1;
             int maxSuperScore = -1;
@@ -49,17 +51,16 @@ public class GameEnd extends ListenerAdapter {
             }
 
             if (winnerID == -1) {
-               String updateEndGameString = "UPDATE Games SET EndDate = \"" + LocalDate.now().toString() + "\" WHERE Current = 1;";
+               String updateEndGameString = "UPDATE Games g JOIN Guilds glds ON g.GuildID = glds.ID SET EndDate = \"" + LocalDate.now().toString() + "\" WHERE g.Current = 1 AND glds.GuildStringID = \"" + event.getGuild().getId() + "\";";
                stmt.executeUpdate(updateEndGameString);
             } else {
-               String updateEndGameString = "UPDATE Games SET PlayerID = \"" + winnerID + "\", EndDate = \"" + LocalDate.now().toString() + "\" WHERE Current = 1;";
+               String updateEndGameString = "UPDATE Games g JOIN Guilds glds ON g.GuildID = glds.ID SET g.PlayerID = \"" + winnerID + "\", g.EndDate = \"" + LocalDate.now().toString() + "\" WHERE g.Current = 1 AND glds.GuildStringID = \"" + event.getGuild().getId() + "\";";
                stmt.executeUpdate(updateEndGameString);
             }
 
             String updateCurrString = "UPDATE Games SET Current = 0;";
             stmt.executeUpdate(updateCurrString);
 
-            GameBuilder gameBoy = new GameBuilder();
             event.getChannel().sendMessage("Game has ended!\n\n" + gameBoy.getPreviousGame(gameID)).queue();
 
          } catch (SQLException e) {

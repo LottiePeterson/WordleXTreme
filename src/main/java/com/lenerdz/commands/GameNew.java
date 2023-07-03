@@ -36,26 +36,66 @@ public class GameNew extends ListenerAdapter {
                // set all other games Current column to 0 so they are not the current games
                // String updateCurrString = "UPDATE Games SET Current = 0;";
                // stmt.executeUpdate(updateCurrString);
-               ResultSet currentGames = stmt.executeQuery("SELECT ID FROM Games WHERE Current = 1;");
+               String guildStringID = event.getGuild().getId();
+               System.out.println(guildStringID + " guild string <-\n");
+               ResultSet guilds = stmt.executeQuery("SELECT ID FROM Guilds WHERE GuildStringID = \"" + guildStringID + "\"");
+               int guildTableID = -1;
+               while(guilds.next()) {
+                  guildTableID = guilds.getInt("ID"); 
+                  System.out.println(guildTableID + " guild string UPDATED<-\n");
+               }
+               System.out.println(guildTableID + " guild string UPDATED 2<-\n");
+               if(guildTableID == -1) {
+                  String guildInsertString = "INSERT INTO Guilds (GuildStringID) VALUES (?);";
+                  PreparedStatement insertNewGuild = conn.prepareStatement(guildInsertString, Statement.RETURN_GENERATED_KEYS);
+
+                  conn.setAutoCommit(false);
+                  insertNewGuild.setString(1, guildStringID);
+                  insertNewGuild.executeUpdate();
+                  conn.commit();
+                  conn.setAutoCommit(true);
+
+                  ResultSet guildIDSet = insertNewGuild.getGeneratedKeys();
+                  if(guildIDSet.next()) {
+                     guildTableID = guildIDSet.getInt(1);
+                  }
+                  System.out.println("Guild table ID test: " + guildTableID + " ");
+                  // stmt.executeUpdate("INSERT INTO Guilds (GuildStringID) VALUES (\"" + guildStringID + "\");");
+                  // guilds = stmt.executeQuery("SELECT ID FROM Guilds WHERE GuildID = \"" + guildStringID + "\"");
+                  // while(guilds.next()) {
+                  //    guildTableID = guilds.getInt("ID");
+                  // }
+               }
+               ResultSet currentGames = stmt.executeQuery("SELECT g.ID FROM Games g JOIN Guilds glds ON g.GuildID = glds.ID WHERE g.Current = 1 AND glds.GuildStringID = \"" + guildTableID + "\";");
                if(currentGames.next()) {
                   event.getChannel().sendMessage("There is already a game active in this server! Try ending that game and then starting a new one.").queue();
                   return;
                }
                
-               String insertString = "INSERT INTO Games (Name, StartDate, EndDate, Current, PlayerID) VALUES (?, ?, NULL, 1, NULL);";
-               PreparedStatement insertNewGame = conn.prepareStatement(insertString);
+               String insertString = "INSERT INTO Games (Name, StartDate, EndDate, Current, PlayerID, GuildID) VALUES (?, ?, NULL, 1, NULL, ?);";
+               PreparedStatement insertNewGame = conn.prepareStatement(insertString, Statement.RETURN_GENERATED_KEYS);
 
                conn.setAutoCommit(false);
                insertNewGame.setString(1, message[3]);
                insertNewGame.setString(2, LocalDate.now().toString());
+               insertNewGame.setInt(3, guildTableID);
                insertNewGame.executeUpdate();
                conn.commit();
+               conn.setAutoCommit(true);
+
+               ResultSet generatedKeys = insertNewGame.getGeneratedKeys();
+               int generatedKey = -1;
+               if(generatedKeys.next()) {
+                  generatedKey = generatedKeys.getInt(1);
+               }
+               System.out.println(generatedKey + " ");
+               if(generatedKey == -1) {
+                  event.getChannel().sendMessage("Bro something went wrong you should check that. Yes, you.").queue();
+                  return;
+               }
+               //stmt.executeUpdate("INSERT INTO GamesGuilds (GameID, GuildID) VALUES (" + generatedKey + ", " + guildTableID +");");
                               
-               // String gameString = "=====** " + message[3] + " **=====\n" + "No Players\n";
-               // for(int i = 0; i < message[3].length() + 12; i++) {
-               //    gameString += "=";
-               // }
-               GameBuilder gameBoy = new GameBuilder();
+               GameBuilder gameBoy = new GameBuilder(event.getGuild().getId());
                event.getChannel().sendMessage(gameBoy.getCurrrentGame()).queue();
 
                // EmbedBuilder embed = new EmbedBuilder();

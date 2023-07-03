@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.lenerdz.services.GameBuilder;
-import com.mysql.cj.protocol.a.BooleanValueEncoder;
 
 import java.sql.ResultSet;
 
@@ -30,8 +29,9 @@ public class History extends ListenerAdapter {
             // embed.setTitle("March");
             // embed.addField("Players:", "boop boop", true);
             // event.getChannel().sendMessageEmbeds(embed.build()).queue();
+            String guildStringID = event.getGuild().getId();
             if (message.length == 2) {
-               ResultSet gameHistory = stmt.executeQuery("SELECT Name, ID, StartDate, EndDate, PlayerID AS Winner FROM Games ORDER BY StartDate;");
+               ResultSet gameHistory = stmt.executeQuery("SELECT g.Name, g.ID, g.StartDate, g.EndDate, g.PlayerID AS Winner FROM Games g JOIN Guilds glds ON g.GuildID = glds.ID WHERE glds.GuildStringID = \"" + guildStringID + "\" ORDER BY StartDate;");
             
                String tempResult = "";
                int gameID = -1;
@@ -42,17 +42,16 @@ public class History extends ListenerAdapter {
                }
 
                if (gameID == -1) {
-                  tempResult = "No games are in your history!";
-                  return;
+                  tempResult = "\nNo games are in your history!";
                }
-               String result = "=====**Game History**=====" + tempResult + "\n=================";
+               String result = "=====**Game History**=====" + tempResult + "\n======================";
                event.getChannel().sendMessage(result).queue();
             } else {
                try {
                   int inputGameId = Integer.parseInt(message[2]);
                   //ResultSet previousGame = stmt.executeQuery("SELECT Name, ID, StartDate, EndDate, PlayerID AS Winner FROM Games WHERE ID = " + inputGameId + ";");
 
-                  GameBuilder gameBoy = new GameBuilder();
+                  GameBuilder gameBoy = new GameBuilder(event.getGuild().getId());
                   // String previousGameString = "";
                   // while(previousGame.next()) {
                   //    previousGameString = gameBoy.getPreviousGame(inputGameId);

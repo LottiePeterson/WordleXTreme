@@ -22,7 +22,7 @@ public class Score extends ListenerAdapter {
 
    @Override
    public void onMessageReceived(MessageReceivedEvent event) {
-      String[] message = event.getMessage().getContentRaw().split(" ");
+      String[] message = event.getMessage().getContentRaw().split("\\s+");
       String formatString = "Wordle Score [GameNumber] \n"
             + "[PlayerName] [numberOfGuesses] \n"
             + "[PlayerName] [numberOfGuesses] \n"
@@ -80,7 +80,7 @@ public class Score extends ListenerAdapter {
             }
             try {
                ResultSet tablePlayers = stmt.executeQuery(
-                     "SELECT gp.PlayerID, gp.GameID, p.WordleName FROM GamesPlayers gp JOIN Players p ON gp.PlayerID = p.ID JOIN Games g ON gp.GameID = g.ID WHERE g.Current = 1;");
+                     "SELECT gp.PlayerID, gp.GameID, p.WordleName FROM GamesPlayers gp JOIN Players p ON gp.PlayerID = p.ID JOIN Games g ON gp.GameID = g.ID JOIN Guilds glds on g.GuildID = glds.ID WHERE g.Current = 1 AND glds.GuildStringID = \"" + event.getGuild().getId() + "\";");
                int resultSetSize = 0;
                while (tablePlayers.next()) {
                   String testyname = tablePlayers.getString("WordleName");
@@ -131,7 +131,7 @@ public class Score extends ListenerAdapter {
             } catch (SQLException e) {
                event.getChannel().sendMessage("Something went wrong!! Contact Jack and Lottie :/").queue();
             }
-            GameBuilder gameBoy = new GameBuilder();
+            GameBuilder gameBoy = new GameBuilder(event.getGuild().getId());
             event.getChannel().sendMessage(gameBoy.getCurrrentGame()).queue();
 
          } catch (SQLException e) {

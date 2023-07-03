@@ -75,7 +75,7 @@ public class AddPlayer extends ListenerAdapter {
 
             // Get the gameID from the Game table for the current game
             int gameID = -1;
-            ResultSet gameInfo = stmt.executeQuery("SELECT ID FROM Games WHERE Current = 1");
+            ResultSet gameInfo = stmt.executeQuery("SELECT g.ID FROM Games g JOIN Guilds glds ON g.GuildID = glds.ID WHERE Current = 1 AND glds.GuildStringID = \"" + event.getGuild().getId() + "\";");
             while(gameInfo.next()) {
                gameID = gameInfo.getInt("ID");
             }
@@ -98,7 +98,7 @@ public class AddPlayer extends ListenerAdapter {
             String baseScoreInsertString = "INSERT INTO Scores (GameID, PlayerID, WordleNum, SubScore, SuperScore) VALUES (" + gameID + ", " + playerID + ", -1, 0, 0)";
             stmt.executeUpdate(baseScoreInsertString);
 
-            GameBuilder gameBoy = new GameBuilder();
+            GameBuilder gameBoy = new GameBuilder(event.getGuild().getId());
             event.getChannel().sendMessage(gameBoy.getCurrrentGame()).queue();
          } catch (SQLException e) {
             e.printStackTrace();
