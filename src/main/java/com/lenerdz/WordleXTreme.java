@@ -31,5 +31,6 @@ public class WordleXTreme {
         bot.addEventListener(new AddPlayer());
         bot.addEventListener(new GameEnd());
         bot.addEventListener(new History());
+        bot.addEventListener(new Help());
     }
 }
