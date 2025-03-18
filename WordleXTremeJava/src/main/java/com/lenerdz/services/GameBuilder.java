@@ -74,7 +74,7 @@ public class GameBuilder {
 
             int confirmedGameID = pastGameID(stmt, gameID);
             if (confirmedGameID == -1) {
-                return "There is no game with that ID in this server!";
+                return "There is no past game with that ID in this server!";
             }
 
             ResultSet gameInfo = stmt.executeQuery("SELECT p.WordleName, g.PlayerID AS WinnerID, gp.PlayerID, g.Name, SUM(s.SubScore) AS totalSubScore, SUM(s.SuperScore) AS totalSuperScore FROM GamesPlayers gp JOIN Games g ON gp.GameID = g.ID JOIN Scores s ON gp.PlayerID = s.PlayerID AND gp.GameID = s.GameID JOIN Players p on gp.PlayerID = p.ID JOIN Guilds glds ON glds.ID = g.GuildID WHERE g.ID = " + gameID + " AND glds.GuildStringID = \"" + guildStringID + "\" GROUP BY p.WordleName, gp.PlayerID, gp.GameID ORDER BY p.WordleName;");
@@ -91,6 +91,7 @@ public class GameBuilder {
                winnerID = gameInfo.getInt("WinnerID");
                if (winnerID == gameInfo.getInt("PlayerID")) {
                     winnerName = playerName;
+                    break;
                } else if (count > 0) {
                     winnerName = "NONE - A TIE!";
                } else {
@@ -126,7 +127,7 @@ public class GameBuilder {
     }
 
     private int pastGameID(Statement stmt, int pastID) throws SQLException {
-        ResultSet gameInfo = stmt.executeQuery("SELECT g.ID AS GameID FROM Games g JOIN Guilds glds ON g.guildID = glds.ID WHERE g.ID = " + pastID + " AND glds.GuildStringID = \"" + guildStringID + "\";");
+        ResultSet gameInfo = stmt.executeQuery("SELECT g.ID AS GameID FROM Games g JOIN Guilds glds ON g.guildID = glds.ID WHERE g.ID = " + pastID + " AND glds.GuildStringID = \"" + guildStringID + "\" AND g.Current != 1;");
         while(gameInfo.next()) {
             return gameInfo.getInt("GameID");
         }

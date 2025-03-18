@@ -103,7 +103,6 @@ public class AddPlayer extends ListenerAdapter {
          } catch (SQLException e) {
             e.printStackTrace();
          }
-         
       }
    }
 }

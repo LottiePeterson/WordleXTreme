@@ -31,7 +31,7 @@ public class History extends ListenerAdapter {
             // event.getChannel().sendMessageEmbeds(embed.build()).queue();
             String guildStringID = event.getGuild().getId();
             if (message.length == 2) {
-               ResultSet gameHistory = stmt.executeQuery("SELECT g.Name, g.ID, g.StartDate, g.EndDate, g.PlayerID AS Winner FROM Games g JOIN Guilds glds ON g.GuildID = glds.ID WHERE glds.GuildStringID = \"" + guildStringID + "\" ORDER BY StartDate;");
+               ResultSet gameHistory = stmt.executeQuery("SELECT g.Name, g.ID, g.StartDate, g.EndDate, g.PlayerID AS Winner FROM Games g JOIN Guilds glds ON g.GuildID = glds.ID WHERE glds.GuildStringID = \"" + guildStringID + "\" AND g.Current != 1 ORDER BY StartDate;");
             
                String tempResult = "";
                int gameID = -1;
