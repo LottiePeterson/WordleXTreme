@@ -4,3 +4,4 @@
 *.jar
 target
 **/.env
+__pycache__

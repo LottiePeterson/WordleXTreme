@@ -17,7 +17,7 @@ try:
         host=HOST,
         user=USER,
         password=PASSWORD,
-        database=DATABASE  # Omit if you want to connect to the server without specifying a DB
+        database=DATABASE
     )
     print("Connection successful!")
 
